@@ -15,4 +15,5 @@ The component
 is a simple wrapper to anything you want to transition when the UI gets re-rendered.
 
 Live demo here: https://qrdj6.csb.app/
+
 CodeSandBox here: https://codesandbox.io/s/flipped-qrdj6?file=/src/App.tsx
