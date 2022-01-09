@@ -12,9 +12,25 @@ const numSort = (a: number, b: number) => a - b;
 export default function App() {
   const [arr, setArr] = React.useState(values);
   const [disposedArr, setDisposedArr] = React.useState<number[]>([]);
+  const [enlargeddArr, setEnlargedArr] = React.useState<number[]>([]);
 
   function shuffleArray() {
     setArr([...arr.sort(shuffle)]);
+  }
+
+  function enlarge(v: number) {
+    return () => {
+      const i = enlargeddArr.indexOf(v);
+
+      if (i > -1) {
+        setEnlargedArr([
+          ...enlargeddArr.slice(0, i),
+          ...enlargeddArr.slice(i + 1),
+        ]);
+      } else {
+        setEnlargedArr([...enlargeddArr, v]);
+      }
+    };
   }
 
   function dispose(v: number) {
@@ -47,42 +63,64 @@ export default function App() {
     );
   }
 
+  React.useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setEnlargedArr([i]);
+      i++;
+      if (i > values.length - 1) {
+        i = 0;
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="App">
-      <Grid cols={2}>
-        <div className="readme">
-          <Intro />
-        </div>
-        <div className="wrapper">
-          {arr.map((v) => (
+      <div className="wrapper">
+        {arr.map((v, index) => {
+          const classes = ["tile"];
+          const i = enlargeddArr.indexOf(v);
+
+          if (i !== -1) classes.push("enlarged");
+          if (index === enlargeddArr[0] - 1) classes.push("prev");
+          if (index === enlargeddArr[0] + 1) classes.push("next");
+
+          return (
             <Flipped
               key={v}
+              className={classes.join(" ")}
               duration={400}
               easing="ease-in-out"
               onEnter={onEnter}
-              onClick={dispose(v)}
+              onClick={enlarge(v)}
             >
-              <div className="tile">{v}</div>
+              {/* <div className="tile">{v}</div> */}
+              <img
+                src={`https://source.unsplash.com/random/?city,night&sig=${v}`}
+                alt="random"
+              />
             </Flipped>
-          ))}
-        </div>
-        <div>
-          <button onClick={shuffleArray}>Shuffle</button>
-        </div>
-        <div className="container">
-          {disposedArr.map((v) => (
-            <Flipped
-              key={v}
-              duration={400}
-              easing="ease-in-out"
-              onEnter={onEnter}
-              onClick={restore(v)}
-            >
-              <div className="tile">{v}</div>
-            </Flipped>
-          ))}
-        </div>
-      </Grid>
+          );
+        })}
+      </div>
+      <div>
+        <button onClick={shuffleArray}>Shuffle</button>
+      </div>
+      <div className="container">
+        {disposedArr.map((v) => (
+          <Flipped
+            key={v}
+            duration={400}
+            easing="ease-in-out"
+            onEnter={onEnter}
+            onClick={restore(v)}
+          >
+            <div className="tile">{v}</div>
+          </Flipped>
+        ))}
+      </div>
     </div>
   );
 }

@@ -27,11 +27,15 @@ const Flipped: FC<Props> = ({
 
       const deltaX = first.left - current.left;
       const deltaY = first.top - current.top;
+      const ratioW = first.width / current.width;
+      const ratioH = first.height / current.height;
 
       element.animate(
         [
-          { transform: `translate(${deltaX}px, ${deltaY}px)` },
-          { transform: "translate(0,0)" },
+          {
+            transform: `translate(${deltaX}px, ${deltaY}px) scale(${ratioW}, ${ratioH})`,
+          },
+          { transform: "translate(0,0)  scale(1, 1)" },
         ],
         {
           duration,
@@ -42,6 +46,11 @@ const Flipped: FC<Props> = ({
       if (onEnter) onEnter(elRef.current!);
     }
   }, [elRef, element, duration, easing, first, onEnter]);
+
+  React.useLayoutEffect(() => {
+    elRef.current!.style.willChange = "transform, opacity";
+    elRef.current!.style.transformOrigin = "0 0";
+  }, [elRef]);
 
   return (
     <div ref={elRef} {...rest}>
